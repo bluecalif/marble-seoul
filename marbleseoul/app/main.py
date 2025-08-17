@@ -492,7 +492,11 @@ if "chat_action" in locals() and chat_action:
 
         try:
             write_log("🔄 CALLING LLM...")
+            print("🚨🚨🚨 MAIN.PY: ABOUT TO CALL LC.PREDICT() 🚨🚨🚨")
+            print(f"🚨 ACTION_DATA: {action_data}")
+            print(f"🚨 CONTEXT: {context[:100] if context else 'None'}...")
             response = lc.predict(action_data, context)
+            print(f"🚨🚨🚨 MAIN.PY: LC.PREDICT() RETURNED: {response[:100] if response else 'None'}... 🚨🚨🚨")
             write_log(
                 f"✅ LLM RESPONSE: {response[:100]}..."
                 if response
