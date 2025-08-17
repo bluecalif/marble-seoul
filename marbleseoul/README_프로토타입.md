@@ -170,6 +170,24 @@ project_root/marbleseoul/app> streamlit run main.py
 - **⚡ 개발 효율성 혁신**: GitHub 푸시 없이 배포 문제 조기 발견 시스템
 - **🛡️ 범용 적용 가능**: 모든 클라우드 플랫폼 및 웹 프레임워크에 적용 가능
 
+### v0.2.2 (2025-08-17, LLM 캐시 문제 완전 해결) 🔥
+**🎯 중대한 발견**: API 키가 설정되어 있어도 `[echo]` 응답이 나오는 **LLM 캐시 문제** 완전 해결
+
+**🔍 문제 진단**:
+- **현상**: Streamlit Cloud Secrets에 API 키 설정했음에도 불구하고 `EchoResponder` 지속 사용
+- **원인**: LLM 객체가 앱 시작 시 캐시되어, API 키 변경사항이 반영되지 않음
+- **해결**: `predict()` 함수에서 `force_reset=True` 적용으로 매번 새로운 LLM 객체 생성
+
+**🛠️ 핵심 수정사항**:
+```python
+# langchain_chat.py 수정
+def predict(prompt: str, context: str | None = None) -> str:
+    llm = get_llm(force_reset=True)  # ← 매번 강제 재생성
+```
+
+**💡 중요한 교훈**:
+> **클라우드 환경에서 환경변수/secrets 변경 시**, 캐시된 객체들이 변경사항을 인식하지 못할 수 있으므로 **강제 재생성 메커니즘**이 필수적입니다.
+
 ### 다음 계획: v0.3 (프롬프트 강화 및 고도화)
 - 단계별 맞춤 LLM 프롬프트 최적화
 - 시계열 분석 (월별/연도별 가격 변동 추이)
@@ -195,6 +213,8 @@ project_root/marbleseoul/app> streamlit run main.py
 ⭐⭐⭐ **PYTHONPATH 최적화**: import 구문 이전 sys.path 설정으로 배포 안정성 확보 ⭐⭐⭐
 ⭐⭐⭐ **배포 환경 시뮬레이션**: 로컬에서 Streamlit Cloud 환경 완벽 재현 ⭐⭐⭐
 ⭐⭐⭐ **Python 패키지 완성**: 프로덕션 레벨 모듈화 및 __init__.py 체계 구축 ⭐⭐⭐
+⭐⭐⭐ **Dependencies 관리**: requirements.txt repository root 배치로 패키지 설치 완성 ⭐⭐⭐
+⭐⭐⭐ **LLM 캐시 문제 해결**: force_reset=True로 API 키 변경사항 즉시 반영 ⭐⭐⭐
 
 ### 7.3 사용자 경험 개선
 - **직관적 4개 모드**: 전체/가격5분위/자치구선택/자치구비교
