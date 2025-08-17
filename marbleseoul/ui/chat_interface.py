@@ -58,13 +58,23 @@ def render_chat_interface(state, latest_month, latest_avg_price, gugun_ranking_d
             st.chat_message(msg["role"]).write(msg["content"])
 
     # --- 사용자 입력 처리 ---
+    print("🚨🚨🚨 CHAT_INTERFACE: CHECKING FOR USER INPUT 🚨🚨🚨")
+    user_action = None  # 기본값 설정
+    
     if user_input := st.chat_input("메시지를 입력하세요…"):
+        print(f"🚨🚨🚨 CHAT_INTERFACE: USER INPUT DETECTED: {user_input} 🚨🚨🚨")
         if any(keyword in user_input for keyword in const.RANKING_KEYWORDS):
             user_action = {"type": "show_ranking", "data": user_input}
+            print(f"🚨 ACTION TYPE: show_ranking")
         elif any(keyword in user_input for keyword in const.RESET_KEYWORDS):
             user_action = {"type": "reset_view", "data": user_input}
+            print(f"🚨 ACTION TYPE: reset_view")
         else:
             # 일반 채팅
             user_action = {"type": "chat", "data": user_input}
+            print(f"🚨 ACTION TYPE: chat")
+        print(f"🚨🚨🚨 CHAT_INTERFACE: RETURNING ACTION: {user_action} 🚨🚨🚨")
+    else:
+        print("🚨🚨🚨 CHAT_INTERFACE: NO USER INPUT - RETURNING None 🚨🚨🚨")
 
     return user_action

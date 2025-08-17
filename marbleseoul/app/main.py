@@ -444,14 +444,18 @@ if "map_action" in locals() and map_action:
 
 # 챗봇 액션 처리
 write_log(f"🔍 CHECKING CHAT ACTION: chat_action={'chat_action' in locals()}")
+print(f"🚨🚨🚨 DEBUG: CHAT ACTION EXISTS? {'chat_action' in locals()}")
 if "chat_action" in locals():
     write_log(f"📋 CHAT ACTION VALUE: {chat_action}")
+    print(f"🚨🚨🚨 DEBUG: CHAT ACTION VALUE: {chat_action}")
+else:
+    print("🚨🚨🚨 DEBUG: NO CHAT_ACTION VARIABLE FOUND!")
 
 if "chat_action" in locals() and chat_action:
     # 딕셔너리 형태의 chat_action 파싱
     if isinstance(chat_action, dict):
-        action_type = chat_action.get('type')
-        action_data = chat_action.get('data')
+        action_type = chat_action.get("type")
+        action_data = chat_action.get("data")
     else:
         action_type, action_data = chat_action
     write_log(f"📨 PROCESSING CHAT ACTION: {action_type}, {action_data}")
@@ -496,7 +500,9 @@ if "chat_action" in locals() and chat_action:
             print(f"🚨 ACTION_DATA: {action_data}")
             print(f"🚨 CONTEXT: {context[:100] if context else 'None'}...")
             response = lc.predict(action_data, context)
-            print(f"🚨🚨🚨 MAIN.PY: LC.PREDICT() RETURNED: {response[:100] if response else 'None'}... 🚨🚨🚨")
+            print(
+                f"🚨🚨🚨 MAIN.PY: LC.PREDICT() RETURNED: {response[:100] if response else 'None'}... 🚨🚨🚨"
+            )
             write_log(
                 f"✅ LLM RESPONSE: {response[:100]}..."
                 if response

@@ -382,9 +382,11 @@ def render_district_mode(
 
     # 챗봇 영역 (맨 아래 배치)
     st.markdown("---")
+    print("🚨🚨🚨 MODE_RENDERER: CALLING CHAT_INTERFACE (DISTRICT_MODE) 🚨🚨🚨")
     chat_action = chat_interface.render_chat_interface(
         st_session_state, latest_month, latest_avg_price, gugun_ranking_df
     )
+    print(f"🚨🚨🚨 MODE_RENDERER: RECEIVED CHAT_ACTION (DISTRICT_MODE): {chat_action} 🚨🚨🚨")
 
     # 모드별 컨텍스트 생성
     context_data = {"mode": "district"}
