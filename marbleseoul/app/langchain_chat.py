@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 # Streamlit secrets 지원을 위한 import
 try:
     import streamlit as st
+
     HAS_STREAMLIT = True
 except ImportError:
     HAS_STREAMLIT = False
@@ -45,31 +46,49 @@ def get_api_key() -> str | None:
     if api_key:
         print("🔑 API Key found in environment variables (local .env)")
         return api_key
-    
+
     # 2. Streamlit secrets에서 확인 (Streamlit Cloud)
     if HAS_STREAMLIT:
         try:
+            # 방법 1: st.secrets["OPENAI_API_KEY"] 직접 접근
+            if "OPENAI_API_KEY" in st.secrets:
+                api_key = st.secrets["OPENAI_API_KEY"]
+                print("🔑 API Key found in Streamlit secrets (cloud - method 1)")
+                return api_key
+            
+            # 방법 2: st.secrets.get() 사용
             api_key = st.secrets.get("OPENAI_API_KEY")
             if api_key:
-                print("🔑 API Key found in Streamlit secrets (cloud)")
+                print("🔑 API Key found in Streamlit secrets (cloud - method 2)")
                 return api_key
+                
         except Exception as e:
             print(f"🔴 Error accessing Streamlit secrets: {e}")
-    
+            # 더 자세한 디버깅을 위해 st.secrets 전체 내용 확인
+            try:
+                print(f"🔵 Available secrets keys: {list(st.secrets.keys())}")
+            except Exception as e2:
+                print(f"🔴 Cannot access secrets keys: {e2}")
+
     print("🔴 No API Key found in .env or Streamlit secrets")
     return None
 
 
-def get_llm():  # noqa: D401
+def get_llm(force_reset: bool = False):  # noqa: D401
     global _llm
-    if _llm is None:
+    if _llm is None or force_reset:
+        print(f"🔄 {'Force resetting' if force_reset else 'Initializing'} LLM...")
         api_key = get_api_key()
         if api_key:
             print(f"🔵 Creating ChatOpenAI with API key: {api_key[:10]}...")
-            _llm = ChatOpenAI(temperature=0.3, model_name="gpt-4o-mini", openai_api_key=api_key)
+            _llm = ChatOpenAI(
+                temperature=0.3, model_name="gpt-4o-mini", openai_api_key=api_key
+            )
         else:
             print("🔴 No API key available, using EchoResponder")
             _llm = EchoResponder()
+    else:
+        print(f"🔵 Using cached LLM: {type(_llm)}")
     return _llm
 
 
@@ -79,7 +98,8 @@ def predict(prompt: str, context: str | None = None) -> str:
     print(f"🔵 PROMPT: {prompt}")
     print(f"🔵 CONTEXT: {context[:100] if context else 'None'}...")
 
-    llm = get_llm()
+    # API 키 변경 감지를 위해 매번 강제 재설정
+    llm = get_llm(force_reset=True)  
     print(f"🔵 LLM TYPE: {type(llm)}")
 
     # 최종 프롬프트 구성
