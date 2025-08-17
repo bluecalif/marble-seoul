@@ -30,6 +30,11 @@ def write_log(message: str):
         f.write(f"[{datetime.now().strftime('%H:%M:%S.%f')}] {message}\n")
 
 
+# --- PYTHONPATH 세팅 (import 전에 먼저 설정!) ---
+ROOT_DIR = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 # --- 모듈 import ---
 from marbleseoul.core import cache_manager, map_manager
 from marbleseoul.data import (
@@ -49,11 +54,6 @@ from marbleseoul.ui import (
 )
 from marbleseoul.app import langchain_chat as lc
 from marbleseoul.utils import formatters as fmt
-
-# --- PYTHONPATH 세팅 ---
-ROOT_DIR = pathlib.Path(__file__).resolve().parents[1]
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
 
 # --- 페이지 설정 및 초기화 ---
 write_log("=== NEW UI STRUCTURE START ===")
