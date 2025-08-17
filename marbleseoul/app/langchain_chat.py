@@ -8,7 +8,14 @@ import os
 from typing import Any
 from dotenv import load_dotenv
 
-# 환경 변수 로드 (.env 파일)
+# Streamlit secrets 지원을 위한 import
+try:
+    import streamlit as st
+    HAS_STREAMLIT = True
+except ImportError:
+    HAS_STREAMLIT = False
+
+# 환경 변수 로드 (.env 파일 - 로컬 개발용)
 load_dotenv()
 
 try:
@@ -31,12 +38,37 @@ class EchoResponder:
 _llm: Any | None = None
 
 
+def get_api_key() -> str | None:
+    """API 키를 로컬(.env) 또는 Streamlit Cloud(secrets)에서 가져옵니다."""
+    # 1. 로컬 환경변수에서 확인 (.env 파일)
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        print("🔑 API Key found in environment variables (local .env)")
+        return api_key
+    
+    # 2. Streamlit secrets에서 확인 (Streamlit Cloud)
+    if HAS_STREAMLIT:
+        try:
+            api_key = st.secrets.get("OPENAI_API_KEY")
+            if api_key:
+                print("🔑 API Key found in Streamlit secrets (cloud)")
+                return api_key
+        except Exception as e:
+            print(f"🔴 Error accessing Streamlit secrets: {e}")
+    
+    print("🔴 No API Key found in .env or Streamlit secrets")
+    return None
+
+
 def get_llm():  # noqa: D401
     global _llm
     if _llm is None:
-        if os.getenv("OPENAI_API_KEY"):
-            _llm = ChatOpenAI(temperature=0.3, model_name="gpt-4o-mini")
+        api_key = get_api_key()
+        if api_key:
+            print(f"🔵 Creating ChatOpenAI with API key: {api_key[:10]}...")
+            _llm = ChatOpenAI(temperature=0.3, model_name="gpt-4o-mini", openai_api_key=api_key)
         else:
+            print("🔴 No API key available, using EchoResponder")
             _llm = EchoResponder()
     return _llm
 
