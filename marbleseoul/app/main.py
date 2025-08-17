@@ -31,7 +31,7 @@ def write_log(message: str):
 
 
 # --- PYTHONPATH 세팅 (import 전에 먼저 설정!) ---
-ROOT_DIR = pathlib.Path(__file__).resolve().parents[1]
+ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
